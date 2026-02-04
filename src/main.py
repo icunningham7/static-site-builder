@@ -17,7 +17,7 @@ def main():
 
     clear_directory(doc_dir)
     copy_directory(static_dir, doc_dir)
-    generate_all_pages(content_dir, template_dir, doc_dir, doc_dest_dir)
+    generate_all_pages(content_dir, template_dir, doc_dir, dest_basepath)
 
 def clear_directory(path):
     if os.path.exists(path):
