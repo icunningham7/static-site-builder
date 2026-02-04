@@ -5,16 +5,19 @@ from textnode import TextNode, TextType
 from block_markdown import markdown_to_html_node, extract_title
 
 def main():
-    basepath = sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent
-    print(basepath)
-    content_dir = Path(os.path.join(basepath, "content"))
-    static_dir = Path(os.path.join(basepath, "static"))
-    template_dir = Path(os.path.join(basepath, "template.html"))
-    public_dir = Path(os.path.join(basepath, "docs"))
+    build_basepath = Path(__file__).resolve().parent.parent
+    print(build_basepath)
+    dest_basepath = sys.argv[1] if len(sys.argv) > 1 else "/"
+    content_dir = Path(os.path.join(build_basepath, "content"))
+    static_dir = Path(os.path.join(build_basepath, "static"))
+    template_dir = Path(os.path.join(build_basepath, "template.html"))
+    doc_dir = Path(os.path.join(build_basepath, "docs"))
+    doc_dest_dir = Path(os.path.join(dest_basepath, "docs"))
 
-    clear_directory(public_dir)
-    copy_directory(static_dir, public_dir)
-    generate_all_pages(content_dir, template_dir, public_dir)
+
+    clear_directory(doc_dir)
+    copy_directory(static_dir, doc_dir)
+    generate_all_pages(content_dir, template_dir, doc_dir, doc_dest_dir)
 
 def clear_directory(path):
     if os.path.exists(path):
@@ -46,19 +49,19 @@ def copy_directory(source, target):
            shutil.copy(source_loc, target_loc)
 
            
-def generate_all_pages(dir_path_content, template_path, dest_dir_path):
+def generate_all_pages(dir_path_content, template_path, dest_dir_path, base_path):
     source_dir = Path(dir_path_content)
     template_dir = Path(template_path)
     dest_dir = Path(dest_dir_path)
 
     for md_path in source_dir.rglob("*.md"):
         rel_path = md_path.relative_to(source_dir).parent
-        page_dest_path = Path(os.path.join(dest_dir, rel_path))
-        generate_page(md_path, template_dir, page_dest_path)
+        page_dest_path = dest_dir / rel_path
+        generate_page(md_path, template_dir, page_dest_path, base_path)
 
 
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, base_path):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}.")
     if not os.path.exists(from_path):
         raise ValueError(f"no file exists at {from_path}")
@@ -74,8 +77,8 @@ def generate_page(from_path, template_path, dest_path):
         page_html = template_content_stream.read()
         page_html = page_html.replace("{{ Title }}", source_title, 1)
         page_html = page_html.replace("{{ Content }}", source_html, 1)
-        page_html = page_html.replace('href="/', f'href="{dest_path}')
-        page_html = page_html.replace('src="/', f'src="{dest_path}')
+        page_html = page_html.replace('href="/', f'href="{base_path}')
+        page_html = page_html.replace('src="/', f'src="{base_path}')
 
     with open(os.path.join(dest_path, "index.html"), "w") as page_content_stream:
         page_content_stream.write(page_html)
