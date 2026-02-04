@@ -17,6 +17,29 @@ class HTMLNode:
 
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
+    
+    def __eq__(self, other):
+        if (
+            self.tag == other.tag
+            and self.value == other.value
+            and self.props == other.props
+        ):
+            if self.children is None and other.children is None:
+                return True
+            
+            if self.children is None or other.children is None:
+                return False
+
+            if self.children and other.children:
+                if len(self.children) != len(other.children):
+                    return False
+                
+                for i, child in enumerate(self.children):
+                    if not child == other.children[i]:
+                        return False
+                    
+        return True
+
 
 
 class LeafNode(HTMLNode):
@@ -56,3 +79,26 @@ class ParentNode(HTMLNode):
 
     def __repr__(self):
         return f"ParentNode({self.tag}, {self.value}, children: {self.children}, {self.props})"
+    
+    def __eq__(self, other):
+        if self.tag != other.tag:
+            return False
+        
+        if self.props != other.props:
+            return False
+    
+        if self.children is None and other.children is None:
+            return True
+    
+        if self.children is None or other.children is None:
+            return False
+
+        if self.children and other.children:
+            if len(self.children) != len(other.children):
+                return False
+            for i, child in enumerate(self.children):
+                if not child == other.children[i]:
+                    return False
+                
+
+        return True
