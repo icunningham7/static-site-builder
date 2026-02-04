@@ -10,7 +10,7 @@ def main():
     content_dir = Path(os.path.join(basepath, "content"))
     static_dir = Path(os.path.join(basepath, "static"))
     template_dir = Path(os.path.join(basepath, "template.html"))
-    public_dir = Path(os.path.join(basepath, "public"))
+    public_dir = Path(os.path.join(basepath, "docs"))
 
     clear_directory(public_dir)
     copy_directory(static_dir, public_dir)
