@@ -1,18 +1,16 @@
-# ./main.sh
-# hello world
-
-import os, shutil
+import os, shutil, sys
 from pathlib import Path
 
 from textnode import TextNode, TextType
 from block_markdown import markdown_to_html_node, extract_title
 
 def main():
-    base_dir = Path(__file__).resolve().parent.parent
-    content_dir = Path(os.path.join(base_dir, "content"))
-    static_dir = Path(os.path.join(base_dir, "static"))
-    template_dir = Path(os.path.join(base_dir, "template.html"))
-    public_dir = Path(os.path.join(base_dir, "public"))
+    basepath = sys.argv[1] if len(sys.argv) > 1 else Path(__file__).resolve().parent.parent
+    print(basepath)
+    content_dir = Path(os.path.join(basepath, "content"))
+    static_dir = Path(os.path.join(basepath, "static"))
+    template_dir = Path(os.path.join(basepath, "template.html"))
+    public_dir = Path(os.path.join(basepath, "public"))
 
     clear_directory(public_dir)
     copy_directory(static_dir, public_dir)
@@ -76,6 +74,8 @@ def generate_page(from_path, template_path, dest_path):
         page_html = template_content_stream.read()
         page_html = page_html.replace("{{ Title }}", source_title, 1)
         page_html = page_html.replace("{{ Content }}", source_html, 1)
+        page_html = page_html.replace('href="/', f'href="{dest_path}')
+        page_html = page_html.replace('src="/', f'src="{dest_path}')
 
     with open(os.path.join(dest_path, "index.html"), "w") as page_content_stream:
         page_content_stream.write(page_html)
